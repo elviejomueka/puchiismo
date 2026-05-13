@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Puchiismo — Test de Corrientes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #B8963E;
+    --gold-light: #D4AF6A;
+    --gold-dim: #7A6030;
+    --ink: #1A1812;
+    --ink-2: #2E2A22;
+    --parchment: #F5F0E8;
+    --parchment-2: #EDE7D9;
+    --parchment-3: #E0D9CC;
+    --border: rgba(184,150,62,0.3);
+    --border-strong: rgba(184,150,62,0.6);
+    --text-muted: #6B6352;
+    --text-dim: #8C7E68;
+    --radius: 4px;
+    --radius-lg: 8px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'EB Garamond', Georgia, serif;
+    background: var(--parchment);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+
+  .noise {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+  /* Header */
+  .site-header { text-align: center; margin-bottom: 3.5rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border-strong); }
+  .ornament { color: var(--gold); font-size: 1.4rem; letter-spacing: 0.3em; margin-bottom: 1rem; display: block; }
+  .site-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  .site-sub {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-style: italic;
+    letter-spacing: 0.02em;
+  }
+
+  /* Manifesto */
+  .manifesto { margin-bottom: 3.5rem; }
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .manifesto-text { font-size: 1.05rem; color: var(--ink-2); line-height: 1.85; }
+  .manifesto-text p { margin-bottom: 1rem; }
+  .manifesto-text p:last-child { margin-bottom: 0; }
+
+  .drop-cap::first-letter {
+    font-family: 'Cinzel', serif;
+    font-size: 3.2em;
+    line-height: 0.75;
+    float: left;
+    margin-right: 0.08em;
+    margin-top: 0.05em;
+    color: var(--gold);
+  }
+
+  /* Pillars */
+  .pillars { margin-bottom: 3.5rem; }
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .pillar {
+    padding: 1.2rem 1.25rem;
+    background: var(--parchment-2);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .pillar:hover { background: var(--parchment); }
+  .pillar-num {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    margin-bottom: 0.5rem;
+  }
+  .pillar-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+  }
+  .pillar-text { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; font-style: italic; }
+
+  /* Test */
+  .test-section { margin-bottom: 3rem; }
+  .test-intro { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.8rem; font-style: italic; }
+
+  .progress-wrap { margin-bottom: 2rem; }
+  .progress-label { font-size: 0.8rem; color: var(--text-dim); letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .progress-track { height: 2px; background: var(--parchment-3); border-radius: 1px; }
+  .progress-fill { height: 100%; background: var(--gold); border-radius: 1px; transition: width 0.4s ease; width: 0%; }
+
+  .question-card {
+    background: var(--parchment-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.2rem;
+    transition: border-color 0.2s;
+  }
+  .question-card.answered { border-color: var(--border-strong); }
+  .q-num { font-family: 'Cinzel', serif; font-size: 0.72rem; color: var(--gold); letter-spacing: 0.15em; margin-bottom: 0.5rem; }
+  .q-text { font-size: 1rem; color: var(--ink); margin-bottom: 1rem; font-weight: 500; }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-family: 'EB Garamond', serif;
+    font-size: 0.95rem;
+    color: var(--ink-2);
+    background: var(--parchment);
+    transition: all 0.15s;
+    text-align: left; width: 100%;
+  }
+  .opt:hover { border-color: var(--gold-dim); background: var(--parchment-2); }
+  .opt.selected { border-color: var(--gold); background: var(--parchment-2); }
+  .opt-letter {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    min-width: 18px;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+  .opt.selected .opt-letter { color: var(--gold-light); font-weight: 500; }
+
+  .submit-btn {
+    margin-top: 2rem;
+    padding: 12px 36px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    color: var(--parchment);
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: block;
+  }
+  .submit-btn:not(:disabled):hover { background: var(--ink-2); border-color: var(--gold-dim); }
+  .submit-btn:disabled { opacity: 0.35; cursor: default; }
+
+  /* Result */
+  .result-card {
+    display: none;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-top: 2.5rem;
+  }
+  .result-card.show { display: block; }
+  .result-header {
+    background: var(--ink);
+    padding: 2rem 2rem 1.5rem;
+    text-align: center;
+    position: relative;
+  }
+  .result-ornament { color: var(--gold); font-size: 1rem; letter-spacing: 0.3em; margin-bottom: 0.8rem; display: block; }
+  .result-corriente {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    color: var(--gold-dim);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+  }
+  .result-name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    color: var(--parchment);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+  .result-badge {
+    display: inline-block;
+    padding: 3px 14px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 2px;
+    font-size: 0.78rem;
+    color: var(--gold-light);
+    letter-spacing: 0.08em;
+    font-style: italic;
+  }
+  .result-body { padding: 1.8rem 2rem; background: var(--parchment-2); }
+  .result-desc { font-size: 1rem; color: var(--ink-2); line-height: 1.8; margin-bottom: 1.5rem; }
+  .result-figures-label { font-family: 'Cinzel', serif; font-size: 0.72rem; color: var(--gold); letter-spacing: 0.15em; margin-bottom: 0.5rem; }
+  .result-figures-val { font-size: 0.9rem; color: var(--text-muted); font-style: italic; margin-bottom: 1.5rem; }
+
+  .bars { border-top: 1px solid var(--border); padding-top: 1.2rem; }
+  .bars-title { font-family: 'Cinzel', serif; font-size: 0.72rem; color: var(--gold); letter-spacing: 0.15em; margin-bottom: 1rem; }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .bar-label { font-size: 0.82rem; color: var(--text-muted); min-width: 120px; font-style: italic; }
+  .bar-track { flex: 1; height: 5px; background: var(--parchment-3); border-radius: 2px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
+  .bar-val { font-size: 0.8rem; color: var(--text-dim); min-width: 34px; text-align: right; font-family: 'Cinzel', serif; }
+
+  .retry-btn {
+    margin-top: 1.5rem;
+    padding: 9px 22px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .retry-btn:hover { border-color: var(--border-strong); color: var(--ink); }
+
+  /* Footer */
+  .site-footer { text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .footer-text { font-size: 0.82rem; color: var(--text-dim); font-style: italic; }
+  .footer-handle { color: var(--gold-dim); }
+
+  @media (max-width: 500px) {
+    .page { padding: 2rem 1rem 4rem; }
+    .result-header { padding: 1.5rem 1.25rem; }
+    .result-body { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+<div class="noise" aria-hidden="true"></div>
+<div class="page">
+
+  <header class="site-header">
+    <span class="ornament">✦ ✦ ✦</span>
+    <h1 class="site-title">El Puchiismo</h1>
+    <p class="site-sub">Sistema doctrinal — Aristocratismo Avaricionista</p>
+  </header>
+
+  <section class="manifesto" aria-label="Manifiesto doctrinal">
+    <div class="section-title">Manifiesto</div>
+    <div class="manifesto-text">
+      <p class="drop-cap">El Puchiismo es un sistema filosófico-político que parte del reconocimiento de la desigualdad ontológica entre los hombres como fundamento del orden legítimo. No es conservadurismo nostálgico ni revolución destructiva: es la voluntad de forma aplicada a la historia. El hombre superior no hereda su lugar — lo conquista, lo justifica, lo sostiene.</p>
+      <p>Su método es stirneriano: disuelve los espectros ideológicos ajenos para llegar a compromisos racionales propios. Su fundamento es tomista: la razón no contradice la fe, la ordena. Su estética es aristocrática: el poder no se disculpa, se ejerce con precisión.</p>
+      <p>Atlánticamente orientado no por amor al orden secular liberal, sino como estrategia de reconquista civilizacional. Católico no por tradición familiar, sino por conclusión racional. Capitalista no por comodidad burguesa, sino porque el mercado es el único mecanismo de selección que produce élites reales.</p>
+    </div>
+  </section>
+
+  <section class="pillars" aria-label="Pilares del sistema">
+    <div class="section-title">Los seis pilares</div>
+    <div class="pillars-grid">
+      <div class="pillar"><div class="pillar-num">I</div><div class="pillar-name">Voluntad de forma</div><div class="pillar-text">La historia es obra de quienes imponen su visión sobre la materia caótica del presente.</div></div>
+      <div class="pillar"><div class="pillar-num">II</div><div class="pillar-name">Antiigualitarismo</div><div class="pillar-text">La jerarquía es natural y fecunda. La igualdad fabricada es una mentira que empobrece.</div></div>
+      <div class="pillar"><div class="pillar-num">III</div><div class="pillar-name">Fundamento católico</div><div class="pillar-text">Cristo como conclusión racional, no como herencia. El tomismo como arquitectura del pensamiento.</div></div>
+      <div class="pillar"><div class="pillar-num">IV</div><div class="pillar-name">Atlantismo reconquistador</div><div class="pillar-text">Apropiación del vector de poder occidental para fines civilizacionales propios.</div></div>
+      <div class="pillar"><div class="pillar-num">V</div><div class="pillar-name">Capitalismo aristocrático</div><div class="pillar-text">El mercado como selección de élites, no como igualador de masas.</div></div>
+      <div class="pillar"><div class="pillar-num">VI</div><div class="pillar-name">Iniciación y orden</div><div class="pillar-text">La fraternidad de los capaces. El conocimiento como jerarquía viva.</div></div>
+    </div>
+  </section>
+
+  <section class="test-section" aria-label="Test de corrientes">
+    <div class="section-title">Test de corrientes</div>
+    <p class="test-intro">Identifica tu tendencia dentro del Puchiismo respondiendo estas ocho preguntas sin titubear.</p>
+
+    <div class="progress-wrap">
+      <div class="progress-label" id="progress-label">0 de 8 respondidas</div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+
+    <div id="questions-container"></div>
+
+    <button class="submit-btn" id="submit-btn" disabled onclick="calcResult()">Descubrir mi corriente</button>
+
+    <div class="result-card" id="result-card" role="region" aria-label="Resultado del test">
+      <div class="result-header">
+        <span class="result-ornament">✦</span>
+        <div class="result-corriente">Tu corriente puchista</div>
+        <div class="result-name" id="result-name"></div>
+        <div class="result-badge" id="result-badge"></div>
+      </div>
+      <div class="result-body">
+        <p class="result-desc" id="result-desc"></p>
+        <div class="result-figures-label">Figuras afines</div>
+        <div class="result-figures-val" id="result-figures"></div>
+        <div class="bars">
+          <div class="bars-title">Composición doctrinal</div>
+          <div id="score-bars"></div>
+        </div>
+        <button class="retry-btn" onclick="resetTest()">↺ Reiniciar test</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p class="footer-text">Puchiismo — Aristocratismo Avaricionista · <span class="footer-handle">@puchocriollo</span></p>
+  </footer>
+
+</div>
+
+<script>
+const questions = [
+  { text: "El principal motor del orden político es:", opts: [
+    { text: "La tradición viva y el derecho natural heredado", scores: { t:3, r:0, i:1, m:1 } },
+    { text: "La voluntad de una élite que impone su forma al mundo", scores: { t:0, r:2, i:1, m:3 } },
+    { text: "El conocimiento reservado a los capaces de recibirlo", scores: { t:1, r:0, i:3, m:1 } },
+    { text: "La expansión de un proyecto civilizacional hacia afuera", scores: { t:1, r:1, i:0, m:3 } }
+  ]},
+  { text: "Frente a una institución corrompida, el puchista debe:", opts: [
+    { text: "Restaurarla desde adentro apelando a su fundamento original", scores: { t:3, r:0, i:1, m:0 } },
+    { text: "Romperla y reemplazarla con una forma superior", scores: { t:0, r:3, i:0, m:2 } },
+    { text: "Crear un orden paralelo de élites que la supere sin confrontarla", scores: { t:0, r:1, i:3, m:1 } },
+    { text: "Usar su estructura como palanca de poder hacia un fin mayor", scores: { t:1, r:1, i:1, m:2 } }
+  ]},
+  { text: "La figura que más te interpela políticamente:", opts: [
+    { text: "Miguel Antonio Caro — gramático, católico, constitucionalista", scores: { t:3, r:0, i:1, m:0 } },
+    { text: "Griffith de Berserk — voluntad total, sacrificio absoluto", scores: { t:0, r:3, i:0, m:2 } },
+    { text: "Joseph de Maistre — masón, católico, reaccionario radical", scores: { t:1, r:1, i:3, m:0 } },
+    { text: "JFK — atlantismo, carisma de élite, proyecto imperial", scores: { t:0, r:1, i:0, m:3 } }
+  ]},
+  { text: "El capitalismo es valioso porque:", opts: [
+    { text: "Preserva el orden natural de la propiedad y la familia", scores: { t:3, r:0, i:0, m:1 } },
+    { text: "Selecciona a los más capaces y destruye a los mediocres", scores: { t:0, r:2, i:0, m:3 } },
+    { text: "Produce la acumulación de poder necesaria para la reconquista", scores: { t:0, r:1, i:1, m:3 } },
+    { text: "Genera una clase propietaria con sentido civilizacional", scores: { t:2, r:0, i:2, m:1 } }
+  ]},
+  { text: "La masonería te atrae como:", opts: [
+    { text: "Tradición de hombres libres con raíces en el orden antiguo", scores: { t:3, r:0, i:2, m:0 } },
+    { text: "Red de poder para hombres que rechazan ser gobernados por mediocres", scores: { t:0, r:2, i:2, m:2 } },
+    { text: "Sistema de iniciación y jerarquía del conocimiento", scores: { t:0, r:0, i:3, m:1 } },
+    { text: "Estructura transnacional para un proyecto civilizacional mayor", scores: { t:0, r:1, i:1, m:3 } }
+  ]},
+  { text: "Nicolás Gómez Dávila te interpela principalmente porque:", opts: [
+    { text: "Su defensa del orden tradicional y la reacción sin concesiones", scores: { t:3, r:0, i:1, m:0 } },
+    { text: "Su desprecio absoluto por el mediocre y el igualitario", scores: { t:1, r:2, i:1, m:1 } },
+    { text: "Su escritura como acto aristocrático y esotérico en sí mismo", scores: { t:0, r:0, i:3, m:0 } },
+    { text: "Su visión de Colombia como parte de una civilización mayor", scores: { t:1, r:1, i:0, m:3 } }
+  ]},
+  { text: "Tu relación con Stirner es:", opts: [
+    { text: "Lo uso para purgar espectros ajenos y afirmar mis convicciones tradicionales", scores: { t:3, r:1, i:0, m:0 } },
+    { text: "Es el punto de partida para una afirmación radical de la voluntad propia", scores: { t:0, r:3, i:1, m:1 } },
+    { text: "Su crítica de los espectros me lleva a un conocimiento más profundo y reservado", scores: { t:0, r:0, i:3, m:1 } },
+    { text: "Es un método crítico que libera energía para proyectos de mayor escala", scores: { t:0, r:1, i:1, m:3 } }
+  ]},
+  { text: "La Colombia que imaginas es:", opts: [
+    { text: "Una república católica restaurada sobre sus fundamentos hispánicos", scores: { t:3, r:0, i:0, m:1 } },
+    { text: "Un Estado transformado por una élite con visión y voluntad implacable", scores: { t:0, r:3, i:0, m:2 } },
+    { text: "Una sociedad gobernada por hombres de conocimiento superior y carácter probado", scores: { t:1, r:0, i:3, m:1 } },
+    { text: "Una potencia regional con vocación atlántica y proyecto civilizacional propio", scores: { t:0, r:1, i:0, m:3 } }
+  ]}
+];
+
+const corrientes = {
+  t: {
+    name: "Puchismo Tradicionalista",
+    badge: "Burkiano · Davileano",
+    desc: "Tu corriente ancla el Puchiismo en la tradición viva: el derecho natural heredado, la república católica, y el orden orgánico como programa político. Eres más Caro que Schmitt, más Gómez Dávila que Stirner. La reacción como fidelidad a lo eterno, no como nostalgia sentimental.",
+    figures: "Miguel Antonio Caro · Nicolás Gómez Dávila · Edmund Burke · Michael Oakeshott",
+    color: "#888780"
+  },
+  r: {
+    name: "Puchismo Revolucionario",
+    badge: "Voluntarista · Schmittiano",
+    desc: "Tu corriente toma la energía jacobina y la invierte hacia arriba. La política como acto total, la ruptura como método, la élite como vanguardia conquistadora. Más Griffith que Caro, más Donoso Cortés que Burke. La revolución no destruye el orden — restaura el orden verdadero.",
+    figures: "Carl Schmitt · Donoso Cortés · Griffith (Berserk) · Georges Sorel",
+    color: "#5F5E5A"
+  },
+  i: {
+    name: "Puchismo Iniciático",
+    badge: "Masónico · Esotérico",
+    desc: "Tu corriente construye el orden desde el conocimiento reservado. La masonería como jerarquía viva, el tomismo como arquitectura secreta, Stirner como purificación del iniciado. El poder no se ejerce en las plazas sino desde los círculos donde los capaces se reconocen entre sí.",
+    figures: "Joseph de Maistre · Kalergi (el aristócrata) · Tradición hermética católica",
+    color: "#185FA5"
+  },
+  m: {
+    name: "Puchismo Imperial",
+    badge: "Atlántico · Civilizacional",
+    desc: "Tu corriente piensa en escala civilizacional. Colombia como nodo de un proyecto atlántico más amplio. JFK y Rubio como modelos operativos. El capitalismo como selección de élites con vocación de poder. La reconquista no es cultural solamente — es geopolítica.",
+    figures: "JFK · Marco Rubio · Kalergi · Geopolítica atlantista",
+    color: "#3C3489"
+  }
+};
+
+const labels = { t: "Tradicionalista", r: "Revolucionario", i: "Iniciático", m: "Imperial" };
+const letters = ['A','B','C','D'];
+let answers = {};
+
+function renderQuestions() {
+  const c = document.getElementById('questions-container');
+  c.innerHTML = questions.map((q, qi) => `
+    <div class="question-card" id="qcard-${qi}">
+      <div class="q-num">Pregunta ${qi+1} · ${questions.length}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="options">
+        ${q.opts.map((o, oi) => `
+          <button class="opt" id="opt-${qi}-${oi}" onclick="selectOpt(${qi},${oi})">
+            <span class="opt-letter">${letters[oi]}.</span>
+            <span>${o.text}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectOpt(qi, oi) {
+  const prev = answers[qi];
+  if (prev !== undefined) document.getElementById(`opt-${qi}-${prev}`).classList.remove('selected');
+  answers[qi] = oi;
+  document.getElementById(`opt-${qi}-${oi}`).classList.add('selected');
+  document.getElementById(`qcard-${qi}`).classList.add('answered');
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = Object.keys(answers).length;
+  const pct = Math.round((answered / questions.length) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${answered} de ${questions.length} respondidas`;
+  document.getElementById('submit-btn').disabled = answered < questions.length;
+}
+
+function calcResult() {
+  const scores = { t:0, r:0, i:0, m:0 };
+  questions.forEach((q, qi) => {
+    const s = q.opts[answers[qi]].scores;
+    Object.keys(s).forEach(k => scores[k] += s[k]);
+  });
+  const total = Object.values(scores).reduce((a,b) => a+b, 0);
+  const winner = Object.keys(scores).reduce((a,b) => scores[a] >= scores[b] ? a : b);
+  const c = corrientes[winner];
+
+  document.getElementById('result-name').textContent = c.name;
+  document.getElementById('result-badge').textContent = c.badge;
+  document.getElementById('result-desc').textContent = c.desc;
+  document.getElementById('result-figures').textContent = c.figures;
+
+  document.getElementById('score-bars').innerHTML = Object.keys(scores).map(k => {
+    const pct = Math.round((scores[k] / total) * 100);
+    return `<div class="bar-row">
+      <div class="bar-label">${labels[k]}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${corrientes[k].color}"></div></div>
+      <div class="bar-val">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('result-card').classList.add('show');
+  document.getElementById('submit-btn').style.display = 'none';
+  setTimeout(() => document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function resetTest() {
+  answers = {};
+  document.getElementById('result-card').classList.remove('show');
+  document.getElementById('submit-btn').style.display = 'block';
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('progress-label').textContent = '0 de 8 respondidas';
+  renderQuestions();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+renderQuestions();
+</script>
+</body>
+</html>
